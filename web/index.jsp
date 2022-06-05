@@ -12,6 +12,6 @@
     <%@include file="vendor/header.jsp" %>
 </head>
 <body>
-
+    <%@include file="vendor/navbar.jsp"%>
 </body>
 </html>
