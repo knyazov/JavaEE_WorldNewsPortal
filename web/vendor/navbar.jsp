@@ -1,11 +1,24 @@
+<%@ page import="Entities.Publications" %>
+<%@ page import="Entities.Languages" %>
 <div class="container mt-2">
     <div class="row">
         <div class="col-sm-2">
-            <select class="form-select" aria-label="Default select example">
-                <option selected>Open this select menu</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
+            <select class="form-select" aria-label="Default select example" name="languageValue">
+                <%
+                    ArrayList<Languages> languages = (ArrayList<Languages>) request.getAttribute("languages");
+                    if (languages != null) {
+                        for (Languages language : languages
+                        ) {
+                %>
+                <a class="nav-link active" href="/index?lng=<%=language.getCode()%>">
+                    <option value="<%=language.getId()%>">
+                        <%=language.getCode()%>
+                    </option>
+                </a>
+                <%
+                        }
+                    }
+                %>
             </select>
         </div>
         <div class="col-sm-6 mx-auto">
@@ -16,9 +29,21 @@
 <nav class="navbar navbar-expand-sm bg-success navbar-dark">
     <div class="container-fluid">
         <ul class="navbar-nav">
+            <%
+                ArrayList<Publications> publications = (ArrayList<Publications>) request.getAttribute("allPublications");
+                if (publications != null) {
+                    for (Publications p :
+                            publications) {
+            %>
             <li class="nav-item">
-                <a class="nav-link active" href="#">BBC</a>
+                <a class="nav-link active" href="/index?pName=<%=p.getName()%>"><%=p.getName()%>
+                </a>
             </li>
+            <%
+                    }
+                }
+            %>
+
         </ul>
     </div>
 </nav>
