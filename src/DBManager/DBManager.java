@@ -3,6 +3,7 @@ package DBManager;
 import Entities.Languages;
 import Entities.News;
 import Entities.Publications;
+import Entities.User;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -32,8 +33,8 @@ public class DBManager {
                     "SELECT n.id, n.title, n.short_content, n.content, n.post_date, n.picture_url, n.language_id, n.publication_id, p.name as publication_name, l.code " +
                     "FROM (news n INNER JOIN languages l on l.id = n.language_id) " +
                     "INNER JOIN publications p " +
-                    "ON p.id = n.publication_id" +
-                    "");
+                    "ON p.id = n.publication_id " +
+                    "ORDER BY n.language_id ASC");
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 News news = new News();
@@ -79,6 +80,47 @@ public class DBManager {
                     "");
             statement.setLong(1, language.getId());
             ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                News news = new News();
+                news.setId(resultSet.getLong("id"));
+                news.setTitle(resultSet.getString("title"));
+                news.setShortContent(resultSet.getString("short_content"));
+                news.setContent(resultSet.getString("content"));
+                news.setPostDate(resultSet.getTimestamp("post_date"));
+                news.setPictureUrl(resultSet.getString("picture_url"));
+
+                Publications publications = new Publications();
+                publications.setId(resultSet.getLong("publication_id"));
+                publications.setName(resultSet.getString("publication_name"));
+
+                Languages languages = new Languages();
+                languages.setId(resultSet.getLong("language_id"));
+                languages.setCode(resultSet.getString("code"));
+
+                news.setPublications(publications);
+                news.setLanguages(languages);
+
+                newsArrayList.add(news);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return newsArrayList;
+    }
+
+    public static ArrayList<News> getNewsByName(String pName) {
+        ArrayList<News> newsArrayList = new ArrayList<>();
+        try {
+            PreparedStatement statement = connection.prepareStatement("" +
+                    "SELECT n.id, n.title, n.short_content, n.content, n.post_date, n.picture_url, n.language_id, n.publication_id, p.name as publication_name, l.code " +
+                    "FROM (news n INNER JOIN languages l on l.id = n.language_id) " +
+                    "INNER JOIN publications p " +
+                    "ON p.id = n.publication_id" +
+                    "WHERE p.name = ? " +
+                    "");
+            statement.setString(1, pName);
+            ResultSet resultSet = statement.executeQuery();
+
             while (resultSet.next()) {
                 News news = new News();
                 news.setId(resultSet.getLong("id"));
@@ -195,5 +237,30 @@ public class DBManager {
         return news;
     }
 
+    public static User getUser(String email) {
+        User user = null;
+
+        try {
+            PreparedStatement statement = connection.prepareStatement("" +
+                    "SELECT * FROM  users " +
+                    "WHERE email = ?" +
+                    "");
+            statement.setString(1, email);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                user = new User(
+                        resultSet.getLong("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("email"),
+                        resultSet.getString("password")
+                );
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
 
 }

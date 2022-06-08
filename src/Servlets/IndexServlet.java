@@ -4,6 +4,7 @@ import DBManager.DBManager;
 import Entities.Languages;
 import Entities.News;
 import Entities.Publications;
+import Entities.User;
 
 
 import javax.servlet.ServletException;
@@ -23,6 +24,11 @@ public class IndexServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        User currentUser = (User) request.getSession().getAttribute("currentUser");
+        if (currentUser != null) {
+            request.setAttribute("currentUsder", currentUser);
+        }
+
         String language = request.getParameter("language");
 //        Cookie cookie = new Cookie("language", language);
 //        response.addCookie(cookie);
@@ -62,7 +68,11 @@ public class IndexServlet extends HttpServlet {
 //        ArrayList<News> getSelectedNews = DBManager.getNews(languages);
 //        request.setAttribute("news", getSelectedNews);
 
-
+        String pName = request.getParameter("pName");
+        if (pName != null){
+            ArrayList<News> news =  DBManager.getNewsByName(pName);
+            request.setAttribute("newsByName", news);
+        }
 
         request.getRequestDispatcher("/index.jsp").forward(request, response);
 
